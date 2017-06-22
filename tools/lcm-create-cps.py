@@ -20,7 +20,8 @@ content = """
     "lcm": {
       "Type": "dylib",
       "Location": "@prefix@/lib/liblcm.so",
-      "Requires": [ ":lcm-coretypes" ]
+      "Requires": [ ":lcm-coretypes" ],
+      "Link-Flags": ["-lglib-2.0"]
     },
     "lcm-gen": {
       "Type": "exe",
