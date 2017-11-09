@@ -82,7 +82,6 @@ build:msan --copt -fsanitize=memory
 build:msan --copt -fsanitize-memory-track-origins
 build:msan --copt -O1
 build:msan --copt -fno-omit-frame-pointer
-build:msan --linkopt -fsanitize=memory
 test:msan --run_under=//tools/dynamic_analysis:msan
 test:msan --test_tag_filters=-gurobi,-mosek,-snopt,-no_msan
 test:msan --test_lang_filters=-py
