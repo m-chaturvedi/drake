@@ -10,12 +10,12 @@ build -c opt
 build --force_pic
 build --strip=never
 build --strict_system_includes
-build --all_incompatible_changes --incompatible_depset_is_not_iterable=false
+build --all_incompatible_changes
 
 # Default test options.
 test --test_output=errors
 test --test_summary=terse
-test --all_incompatible_changes --incompatible_depset_is_not_iterable=false
+test --all_incompatible_changes
 
 # By default, disable execution of tests that require proprietary software.
 # Individual targets that use proprietary software are responsible for ensuring
