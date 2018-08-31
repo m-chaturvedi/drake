@@ -259,7 +259,8 @@ drake_cc_googletest(
 
 drake_cc_googletest(
     name = "implicit_euler_integrator_test",
-    timeout = "moderate",
+    # Made long because it was on the boundary in gcc-asan-everything builds
+    timeout = "long",
     # Adding cache invalidation made this take too long with Valgrind.
     # See Drake issue #9261.
     tags = [
