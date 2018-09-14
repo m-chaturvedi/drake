@@ -20,6 +20,7 @@ load(
     "get_drake_py_installs",
     "get_pybind_package_info",
 )
+load("//tools:pybind11_doc.bzl", "generate_pybind11_doc")
 
 package(default_visibility = [
     "//bindings:__subpackages__",
@@ -159,6 +160,23 @@ drake_pybind_library(
         "//bindings/pydrake/util:deprecation_py",
     ],
     py_srcs = ["symbolic.py"],
+)
+
+generate_pybind11_doc(
+    name = "run_mkdoc",
+    deps = ["cindex_binary", "//common", "//math",
+        # "//automotive", "//common",
+        # "//geometry", "//lcm", "//manipulation", "//math", "//matlab", "//multibody",
+        # "//perception", "//setup", "//solvers", "//systems"
+    ],
+    inputs = ["//:drake_shared_library"],
+    output_filename = "all_doc_symbols.h",
+    mkdoc_label = ":mkdoc.py",
+)
+
+py_library(
+    name = "cindex_binary",
+    srcs = ["cindex.py"],
 )
 
 drake_pybind_library(
