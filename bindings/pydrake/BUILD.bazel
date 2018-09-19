@@ -17,6 +17,7 @@ load(
 load(
     "//tools/skylark:pybind.bzl",
     "drake_pybind_library",
+    "generate_pybind_doc_header",
     "get_drake_py_installs",
     "get_pybind_package_info",
 )
@@ -28,6 +29,49 @@ package(default_visibility = [
 # This determines how `PYTHONPATH` is configured, and how to install the
 # bindings.
 PACKAGE_INFO = get_pybind_package_info(base_package = "//bindings")
+
+generate_pybind_doc_header(
+    name = "doc_py",
+    targets = ["//:drake_shared_library"],
+    out = "doc_py.h",
+    deps = [
+        "//lcmtypes:acrobot",
+        "//lcmtypes:automotive",
+        "//lcmtypes:body_acceleration",
+        "//lcmtypes:body_motion_data",
+        "//lcmtypes:body_wrench_data",
+        "//lcmtypes:constrained_values",
+        "//lcmtypes:contact_info_for_viz",
+        "//lcmtypes:contact_information",
+        "//lcmtypes:contact_results_for_viz",
+        "//lcmtypes:desired_body_motion",
+        "//lcmtypes:desired_centroidal_momentum_dot",
+        "//lcmtypes:desired_dof_motions",
+        "//lcmtypes:drake_signal",
+        "//lcmtypes:iiwa",
+        "//lcmtypes:inverse_dynamics_debug_info",
+        "//lcmtypes:jaco",
+        "//lcmtypes:joint_pd_override",
+        "//lcmtypes:manipulator_plan_move_end_effector",
+        "//lcmtypes:piecewise_polynomial",
+        "//lcmtypes:plan_eval_debug_info",
+        "//lcmtypes:polynomial",
+        "//lcmtypes:polynomial_matrix",
+        "//lcmtypes:qp_controller_input",
+        "//lcmtypes:qp_input",
+        "//lcmtypes:resolved_contact",
+        "//lcmtypes:schunk",
+        "//lcmtypes:support_data",
+        "//lcmtypes:viewer",
+        "//lcmtypes:viewer2_comms",
+        "//lcmtypes:whole_body_data",
+        "//lcmtypes:zmp_data",
+        "//lcmtypes:zmp_com_observer_state",
+        "@gflags",
+        "@lcmtypes_robotlocomotion",
+        "@optitrack_driver//lcmtypes:optitrack_lcmtypes",
+    ],
+)
 
 drake_cc_library(
     name = "pydrake_pybind",
