@@ -114,12 +114,18 @@ drake_pybind_library(
         "__init__.py",
         "common.py",
     ],
+    cc_deps = ["//bindings/pydrake:pydoc_headers"],
 )
 
 drake_cc_library(
     name = "autodiff_types_pybind",
     hdrs = ["autodiff_types_pybind.h"],
     visibility = ["//visibility:public"],
+)
+
+drake_cc_library(
+    name = "pydoc_headers",
+    deps = ["//bindings/pydrake:doc_py"],
 )
 
 drake_pybind_library(

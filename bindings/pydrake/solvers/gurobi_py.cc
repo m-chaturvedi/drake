@@ -1,8 +1,10 @@
 #include "pybind11/pybind11.h"
 
+#include "drake/bindings/pydrake/documentation_pybind.h"
 #include "drake/bindings/pydrake/pydrake_pybind.h"
 #include "drake/solvers/gurobi_solver.h"
 
+#define D(...) DOC(drake, solvers, MathematicalProgam, __VA_ARGS__)
 namespace drake {
 namespace pydrake {
 
@@ -16,7 +18,7 @@ PYBIND11_MODULE(gurobi, m) {
           "MathematicalProgramSolverInterface");
 
   py::class_<GurobiSolver>(m, "GurobiSolver", solverinterface)
-    .def(py::init<>());
+    .def(py::init<>(solvers, GurobiSolver));
 }
 
 }  // namespace pydrake

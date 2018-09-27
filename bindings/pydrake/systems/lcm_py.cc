@@ -3,12 +3,14 @@
 #include "pybind11/eval.h"
 #include "pybind11/pybind11.h"
 
+#include "drake/bindings/pydrake/documentation_pybind.h"
 #include "drake/bindings/pydrake/pydrake_pybind.h"
 #include "drake/bindings/pydrake/systems/systems_pybind.h"
 #include "drake/lcm/drake_lcm_interface.h"
 #include "drake/systems/lcm/lcm_publisher_system.h"
 #include "drake/systems/lcm/lcm_subscriber_system.h"
 #include "drake/systems/lcm/serializer.h"
+#define D(...) DOC(drake, systems, lcm, __VA_ARGS__)
 
 namespace drake {
 namespace pydrake {
@@ -74,7 +76,7 @@ PYBIND11_MODULE(_lcm_py, m) {
     py::class_<Class, PySerializerInterface>(m, "SerializerInterface")
         .def(py::init([]() {
               return std::make_unique<PySerializerInterface>();
-            }));
+            }), D(SerializerInterface, SerializerInterface));
     // TODO(eric.cousineau): Consider providing bindings of C++ types if we want
     // to be able to connect to ports which use C++ LCM types.
   }
@@ -87,10 +89,10 @@ PYBIND11_MODULE(_lcm_py, m) {
                      DrakeLcmInterface*>(),
             py::arg("channel"), py::arg("serializer"), py::arg("lcm"),
             // Keep alive: `self` keeps `DrakeLcmInterface` alive.
-            py::keep_alive<1, 3>())
+            py::keep_alive<1, 3>(), D(LcmPublisherSystem, LcmPublisherSystem))
         .def(
             "set_publish_period", &Class::set_publish_period,
-            py::arg("period"));
+            py::arg("period"), D(LcmPublisherSystem, set_publish_period));
   }
 
   {
@@ -101,7 +103,8 @@ PYBIND11_MODULE(_lcm_py, m) {
                      DrakeLcmInterface*>(),
             py::arg("channel"), py::arg("serializer"), py::arg("lcm"),
             // Keep alive: `self` keeps `DrakeLcmInterface` alive.
-            py::keep_alive<1, 3>());
+            py::keep_alive<1, 3>(),
+                D(LcmSubscriberSystem, LcmSubscriberSystem));
   }
 }
 

@@ -9,6 +9,7 @@
 #include "drake/lcm/drake_lcm.h"
 #include "drake/lcm/drake_lcm_interface.h"
 #include "drake/lcm/drake_mock_lcm.h"
+#define D(...) DOC(drake, lcm, __VA_ARGS__)
 
 namespace drake {
 namespace pydrake {
@@ -24,7 +25,7 @@ PYBIND11_MODULE(lcm, m) {
   {
     using Class = DrakeLcmInterface;
 
-    py::class_<Class>(m, "DrakeLcmInterface")
+    py::class_<Class>(m, "DrakeLcmInterface", D(DrakeLcmInterface))
         // N.B. We do not bind `Subscribe` as multi-threading from C++ may
         // wreak havoc on the Python GIL with a callback.
         .def("Publish", [](
@@ -36,22 +37,25 @@ PYBIND11_MODULE(lcm, m) {
             self->Publish(channel, str.data(), str.size(), time_sec);
           },
           py::arg("channel"), py::arg("buffer"),
-          py::arg("time_sec") = py::none());
+          py::arg("time_sec") = py::none(),
+          D(DrakeLcmInterface, Publish));
   }
 
   {
     using Class = DrakeLcm;
-    py::class_<Class, DrakeLcmInterface>(m, "DrakeLcm")
-        .def(py::init<>())
-        .def("StartReceiveThread", &Class::StartReceiveThread)
-        .def("StopReceiveThread", &Class::StopReceiveThread);
+    py::class_<Class, DrakeLcmInterface>(m, "DrakeLcm", D(DrakeLcm))
+        .def(py::init<>(), D(DrakeLcm, DrakeLcm))
+        .def("StartReceiveThread", &Class::StartReceiveThread,
+          D(DrakeLcm, StartReceiveThread))
+        .def("StopReceiveThread", &Class::StopReceiveThread,
+          D(DrakeLcm, StopReceiveThread));
     // TODO(eric.cousineau): Add remaining methods.
   }
 
   {
     using Class = DrakeMockLcm;
-    py::class_<Class, DrakeLcmInterface>(m, "DrakeMockLcm")
-        .def(py::init<>())
+    py::class_<Class, DrakeLcmInterface>(m, "DrakeMockLcm", D(DrakeMockLcm))
+        .def(py::init<>(), D(DrakeMockLcm, DrakeMockLcm))
         .def("Subscribe", [](
               Class* self, const std::string& channel,
               PyHandlerFunction handler) {
@@ -60,19 +64,20 @@ PYBIND11_MODULE(lcm, m) {
                 [handler](const void* data, int size) {
                   handler(py::bytes(static_cast<const char*>(data), size));
                 });
-          }, py::arg("channel"), py::arg("handler"))
+          }, py::arg("channel"), py::arg("handler"), D(DrakeMockLcm, Subscribe))
         .def("InduceSubscriberCallback", [](
               Class* self, const std::string& channel, py::bytes buffer) {
             std::string str = buffer;
             self->InduceSubscriberCallback(channel, str.data(), str.size());
-          }, py::arg("channel"), py::arg("buffer"))
+          }, py::arg("channel"), py::arg("buffer"),
+            D(DrakeMockLcm, InduceSubscriberCallback))
         .def("get_last_published_message", [](
               const Class* self, const std::string& channel) {
             const std::vector<uint8_t>& bytes =
                 self->get_last_published_message(channel);
             return py::bytes(
                 reinterpret_cast<const char*>(bytes.data()), bytes.size());
-          }, py::arg("channel"));
+          }, py::arg("channel"), D(DrakeMockLcm, get_last_published_message));
     // TODO(eric.cousineau): Add remaining methods.
   }
 }

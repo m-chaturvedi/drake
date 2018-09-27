@@ -3,6 +3,7 @@
 #include "pybind11/pybind11.h"
 #include "pybind11/stl.h"
 
+#include "drake/bindings/pydrake/documentation_pybind.h"
 #include "drake/bindings/pydrake/pydrake_pybind.h"
 #include "drake/bindings/pydrake/symbolic_types_pybind.h"
 #include "drake/bindings/pydrake/util/wrap_pybind.h"
@@ -13,6 +14,7 @@
 #include "drake/systems/controllers/inverse_dynamics_controller.h"
 #include "drake/systems/controllers/linear_quadratic_regulator.h"
 
+#define D(...) DOC(drake, systems, controllers, __VA_ARGS__)
 namespace drake {
 namespace pydrake {
 
@@ -29,38 +31,51 @@ PYBIND11_MODULE(controllers, m) {
   py::module::import("pydrake.systems.primitives");
 
   py::class_<DynamicProgrammingOptions::PeriodicBoundaryCondition>(
-      m, "PeriodicBoundaryCondition")
-      .def(py::init<int, double, double>());
+      m, "PeriodicBoundaryCondition",
+      D(DynamicProgrammingOptions, PeriodicBoundaryCondition))
+      .def(py::init<int, double, double>(),
+          D(DynamicProgrammingOptions, PeriodicBoundaryCondition, 
+            PeriodicBoundaryCondition));
 
-  py::class_<DynamicProgrammingOptions>(m, "DynamicProgrammingOptions")
-      .def(py::init<>())
+  py::class_<DynamicProgrammingOptions>(m, "DynamicProgrammingOptions",
+      D(DynamicProgrammingOptions))
+      .def(py::init<>(),
+          D(DynamicProgrammingOptions, DynamicProgrammingOptions))
       .def_readwrite("discount_factor",
-                     &DynamicProgrammingOptions::discount_factor)
+                     &DynamicProgrammingOptions::discount_factor,
+        D(DynamicProgrammingOptions, discount_factor))
       .def_readwrite("periodic_boundary_conditions",
-                     &DynamicProgrammingOptions::periodic_boundary_conditions)
+                     &DynamicProgrammingOptions::periodic_boundary_conditions,
+        D(DynamicProgrammingOptions, periodic_boundary_conditions))
       .def_readwrite("convergence_tol",
-                     &DynamicProgrammingOptions::convergence_tol)
+                     &DynamicProgrammingOptions::convergence_tol,
+        D(DynamicProgrammingOptions, convergence_tol))
       .def_readwrite("visualization_callback",
-                     &DynamicProgrammingOptions::visualization_callback);
+                     &DynamicProgrammingOptions::visualization_callback,
+        D(DynamicProgrammingOptions, visualization_callback));
 
   py::class_<InverseDynamics<double>, LeafSystem<double>> idyn(
-    m, "InverseDynamics");
+    m, "InverseDynamics", D(InverseDynamics));
   idyn.def(py::init<const RigidBodyTree<double>*,
       InverseDynamics<double>::InverseDynamicsMode>(),
       py::arg("tree"),
-      py::arg("mode"));
+      py::arg("mode"), D(InverseDynamics, InverseDynamics));
   idyn.def("is_pure_gravity_compensation",
-      &InverseDynamics<double>::is_pure_gravity_compensation);
+      &InverseDynamics<double>::is_pure_gravity_compensation,
+      D(InverseDynamics, is_pure_gravity_compensation));
 
   py::enum_<InverseDynamics<double>::InverseDynamicsMode>(
       idyn, "InverseDynamicsMode")
-      .value("kInverseDynamics", InverseDynamics<double>::kInverseDynamics)
+      .value("kInverseDynamics", InverseDynamics<double>::kInverseDynamics,
+      D(InverseDynamics, kInverseDynamics))
       .value("kGravityCompensation",
-          InverseDynamics<double>::kGravityCompensation)
+          InverseDynamics<double>::kGravityCompensation,
+          D(InverseDynamics, kGravityCompensation))
       .export_values();
 
   py::class_<InverseDynamicsController<double>, Diagram<double>>(
-      m, "InverseDynamicsController")
+      m, "InverseDynamicsController",
+      D(InverseDynamicsController))
       .def(py::init<std::unique_ptr<RigidBodyTree<double>>,
                     const VectorX<double>&,
                     const VectorX<double>&,
@@ -73,7 +88,8 @@ PYBIND11_MODULE(controllers, m) {
            py::arg("has_reference_acceleration"),
            // Keep alive, ownership: RigidBodyTree keeps this alive.
            // See "Keep Alive Behavior" in pydrake_pybind.h for details.
-           py::keep_alive<2 /* Nurse */, 1 /* Patient */>())
+           py::keep_alive<2 /* Nurse */, 1 /* Patient */>(),
+               D(InverseDynamicsController, InverseDynamicsController, 3))
       .def(py::init<const MultibodyPlant<double>&,
                     const VectorX<double>&,
                     const VectorX<double>&,
@@ -85,14 +101,19 @@ PYBIND11_MODULE(controllers, m) {
            py::arg("kd"),
            py::arg("has_reference_acceleration"),
            // Keep alive, reference: `self` keeps `MultibodyPlant` alive.
-           py::keep_alive<1, 2>())
+           py::keep_alive<1, 2>(),
+           D(InverseDynamicsController, InverseDynamicsController, 4))
       .def("set_integral_value",
-           &InverseDynamicsController<double>::set_integral_value);
+           &InverseDynamicsController<double>::set_integral_value,
+           D(InverseDynamicsController, set_integral_value));
 
-  m.def("FittedValueIteration", WrapCallbacks(&FittedValueIteration));
+  m.def("FittedValueIteration", WrapCallbacks(&FittedValueIteration),
+      D(InverseDynamicsController, FittedValueIteration));
 
   m.def("LinearProgrammingApproximateDynamicProgramming",
-        WrapCallbacks(&LinearProgrammingApproximateDynamicProgramming));
+        WrapCallbacks(&LinearProgrammingApproximateDynamicProgramming),
+      D(InverseDynamicsController,
+        LinearProgrammingApproximateDynamicProgramming));
 
   m.def("LinearQuadraticRegulator",
         [](const Eigen::Ref<const Eigen::MatrixXd>& A,
@@ -104,7 +125,8 @@ PYBIND11_MODULE(controllers, m) {
           return std::make_pair(result.K, result.S);
         },
         py::arg("A"), py::arg("B"), py::arg("Q"), py::arg("R"),
-        py::arg("N") = Eigen::Matrix<double, 0, 0>::Zero());
+        py::arg("N") = Eigen::Matrix<double, 0, 0>::Zero(),
+        D(InverseDynamicsController, LinearQuadraticRegulator));
 
   m.def("DiscreteTimeLinearQuadraticRegulator",
         [](const Eigen::Ref<const Eigen::MatrixXd>& A,
@@ -114,7 +136,8 @@ PYBIND11_MODULE(controllers, m) {
           auto result = DiscreteTimeLinearQuadraticRegulator(A, B, Q, R);
           return std::make_pair(result.K, result.S);
         },
-        py::arg("A"), py::arg("B"), py::arg("Q"), py::arg("R"));
+        py::arg("A"), py::arg("B"), py::arg("Q"), py::arg("R"),
+        D(InverseDynamicsController, DiscreteTimeLinearQuadraticRegulator));
 
   m.def("LinearQuadraticRegulator",
         py::overload_cast<const systems::LinearSystem<double>&,
@@ -123,7 +146,8 @@ PYBIND11_MODULE(controllers, m) {
                           const Eigen::Ref<const Eigen::MatrixXd>&>(
             &LinearQuadraticRegulator),
         py::arg("system"), py::arg("Q"), py::arg("R"),
-        py::arg("N") = Eigen::Matrix<double, 0, 0>::Zero());
+        py::arg("N") = Eigen::Matrix<double, 0, 0>::Zero(),
+        D(controller, LinearQuadraticRegulator));
 
   m.def("LinearQuadraticRegulator",
         py::overload_cast<const systems::System<double>&,
@@ -133,7 +157,8 @@ PYBIND11_MODULE(controllers, m) {
                           const Eigen::Ref<const Eigen::MatrixXd>&>(
             &LinearQuadraticRegulator),
         py::arg("system"), py::arg("context"), py::arg("Q"), py::arg("R"),
-        py::arg("N") = Eigen::Matrix<double, 0, 0>::Zero());
+        py::arg("N") = Eigen::Matrix<double, 0, 0>::Zero(),
+        D(controller, LinearQuadraticRegulator));
 }
 
 }  // namespace pydrake

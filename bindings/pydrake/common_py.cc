@@ -9,6 +9,8 @@
 #include "drake/common/drake_path.h"
 #include "drake/common/find_resource.h"
 #include "drake/common/temp_directory.h"
+#include "drake/doc_py.h"
+#define D(...) DOC(drake, __VA_ARGS__)
 
 namespace drake {
 namespace pydrake {
@@ -25,10 +27,14 @@ void trigger_an_assertion_failure() {
 PYBIND11_MODULE(_common_py, m) {
   m.doc() = "Bindings for //common:common";
 
-  py::enum_<drake::RandomDistribution>(m, "RandomDistribution")
-    .value("kUniform", drake::RandomDistribution::kUniform)
-    .value("kGaussian", drake::RandomDistribution::kGaussian)
-    .value("kExponential", drake::RandomDistribution::kExponential);
+  py::enum_<drake::RandomDistribution>(m, "RandomDistribution",
+    D(RandomDistribution))
+    .value("kUniform", drake::RandomDistribution::kUniform,
+    D(RandomDistribution, kUniform))
+    .value("kGaussian", drake::RandomDistribution::kGaussian,
+    D(RandomDistribution, kGaussian))
+    .value("kExponential", drake::RandomDistribution::kExponential,
+    D(RandomDistribution, kExponential));
 
 // Turn DRAKE_ASSERT and DRAKE_DEMAND exceptions into native SystemExit.
   // Admittedly, it's unusual for a python library like pydrake to raise
@@ -45,36 +51,42 @@ PYBIND11_MODULE(_common_py, m) {
   m.def("AddResourceSearchPath", &AddResourceSearchPath,
         "Adds a path in which to search for resource files. "
         "The path refers to the relative path within the Drake repository, ",
-        py::arg("search_path"));
+        py::arg("search_path"),
+        D(AddResourceSearchPath));
   // Convenient wrapper to get the list of resource search paths.
   m.def("GetResourceSearchPaths", &GetResourceSearchPaths,
         "Gets a copy of the list of paths set programmatically in which "
-        "resource files are searched.");
+        "resource files are searched.",
+        D(GetResourceSearchPaths));
   // Convenient wrapper for querying FindResource(resource_path).
   m.def("FindResourceOrThrow", &FindResourceOrThrow,
         "Attempts to locate a Drake resource named by the given path string. "
         "The path refers to the relative path within the Drake repository, "
         "e.g., drake/examples/pendulum/Pendulum.urdf. Raises an exception "
         "if the resource was not found.",
-        py::arg("resource_path"));
+        py::arg("resource_path"),
+        D(FindResourceOrThrow));
   m.def("temp_directory", &temp_directory,
         "Returns a directory location suitable for temporary files that is "
         "the value of the environment variable TEST_TMPDIR if defined or "
         "otherwise ${TMPDIR:-/tmp}/robotlocomotion_drake_XXXXXX where each X "
         "is replaced by a character from the portable filename character set. "
-        "Any trailing / will be stripped from the output.");
+        "Any trailing / will be stripped from the output.",
+        D(temp_directory));
   // Returns the fully-qualified path to the root of the `drake` source tree.
   #pragma GCC diagnostic push
   #pragma GCC diagnostic ignored "-Wdeprecated-declarations"
   m.def("GetDrakePath", &GetDrakePath,
-        "Get Drake path");
+        "Get Drake path", D(GetDrakePath));
   #pragma GCC diagnostic pop  // pop -Wdeprecated-declarations
   // These are meant to be called internally by pydrake; not by users.
   m.def("set_assertion_failure_to_throw_exception",
         &drake_set_assertion_failure_to_throw_exception,
-        "Set Drake's assertion failure mechanism to be exceptions");
+        "Set Drake's assertion failure mechanism to be exceptions",
+        D(set_assertion_failure_to_throw_exception));
   m.def("trigger_an_assertion_failure", &trigger_an_assertion_failure,
-        "Trigger a Drake C++ assertion failure");
+        "Trigger a Drake C++ assertion failure",
+        D(trigger_an_assertion_failure));
 }
 
 }  // namespace pydrake

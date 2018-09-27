@@ -2,6 +2,7 @@
 
 #include "drake/bindings/pydrake/pydrake_pybind.h"
 #include "drake/solvers/ipopt_solver.h"
+#define D(...) DOC(drake, __VA_ARGS__)
 
 namespace drake {
 namespace pydrake {
@@ -15,8 +16,9 @@ PYBIND11_MODULE(ipopt, m) {
       py::module::import("pydrake.solvers.mathematicalprogram").attr(
           "MathematicalProgramSolverInterface");
 
-  py::class_<IpoptSolver>(m, "IpoptSolver", solverinterface)
-    .def(py::init<>());
+  py::class_<IpoptSolver>(m, "IpoptSolver", solverinterface,
+    D(solvers, IpoptSolver))
+    .def(py::init<>(), D(solvers, IpoptSolver, IpoptSolver));
 }
 
 }  // namespace pydrake
