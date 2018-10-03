@@ -5,6 +5,7 @@
 #include "pybind11/pybind11.h"
 #include "pybind11/stl.h"
 
+#include "drake/bindings/pydrake/documentation_pybind.h"
 #include "drake/bindings/pydrake/pydrake_pybind.h"
 #include "drake/math/barycentric.h"
 #include "drake/math/rigid_transform.h"
@@ -20,6 +21,7 @@ PYBIND11_MODULE(math, m) {
   using namespace drake::math;
 
   m.doc() = "Bindings for //math.";
+  auto& doc = pydrake_doc.drake.math;
 
   py::module::import("pydrake.util.eigen_geometry");
 
@@ -29,17 +31,24 @@ PYBIND11_MODULE(math, m) {
   using T = double;
 
   m.def("wrap_to", &wrap_to<T, T>, py::arg("value"), py::arg("low"),
-        py::arg("high"));
+        py::arg("high"), doc.wrap_to.doc);
 
-  py::class_<BarycentricMesh<T>>(m, "BarycentricMesh")
-      .def(py::init<BarycentricMesh<T>::MeshGrid>())
-      .def("get_input_grid", &BarycentricMesh<T>::get_input_grid)
-      .def("get_input_size", &BarycentricMesh<T>::get_input_size)
-      .def("get_num_mesh_points", &BarycentricMesh<T>::get_num_mesh_points)
-      .def("get_num_interpolants", &BarycentricMesh<T>::get_num_interpolants)
+  py::class_<BarycentricMesh<T>>(m, "BarycentricMesh", doc.BarycentricMesh.doc)
+      .def(py::init<BarycentricMesh<T>::MeshGrid>(),
+          doc.BarycentricMesh.ctor.doc)
+      .def("get_input_grid", &BarycentricMesh<T>::get_input_grid,
+          doc.BarycentricMesh.get_input_grid.doc)
+      .def("get_input_size", &BarycentricMesh<T>::get_input_size,
+          doc.BarycentricMesh.get_input_size.doc)
+      .def("get_num_mesh_points", &BarycentricMesh<T>::get_num_mesh_points,
+          doc.BarycentricMesh.get_num_mesh_points.doc)
+      .def("get_num_interpolants", &BarycentricMesh<T>::get_num_interpolants,
+          doc.BarycentricMesh.get_num_interpolants.doc)
       .def("get_mesh_point", overload_cast_explicit<VectorX<T>, int>(
-                                 &BarycentricMesh<T>::get_mesh_point))
-      .def("get_all_mesh_points", &BarycentricMesh<T>::get_all_mesh_points)
+                                 &BarycentricMesh<T>::get_mesh_point),
+          doc.BarycentricMesh.get_mesh_point.doc)
+      .def("get_all_mesh_points", &BarycentricMesh<T>::get_all_mesh_points,
+          doc.BarycentricMesh.get_all_mesh_points.doc)
       .def("EvalBarycentricWeights",
            [](const BarycentricMesh<T>* self,
               const Eigen::Ref<const VectorX<T>>& input) {
@@ -48,36 +57,50 @@ PYBIND11_MODULE(math, m) {
              VectorX<T> weights(n);
              self->EvalBarycentricWeights(input, &indices, &weights);
              return std::make_pair(indices, weights);
-           })
+           }, doc.BarycentricMesh.EvalBarycentricWeights.doc)
       .def("Eval", overload_cast_explicit<VectorX<T>,
                                           const Eigen::Ref<const MatrixX<T>>&,
                                           const Eigen::Ref<const VectorX<T>>&>(
-                       &BarycentricMesh<T>::Eval))
-      .def("MeshValuesFrom", &BarycentricMesh<T>::MeshValuesFrom);
+                       &BarycentricMesh<T>::Eval), doc.BarycentricMesh.Eval.doc)
+      .def("MeshValuesFrom", &BarycentricMesh<T>::MeshValuesFrom,
+          doc.BarycentricMesh.MeshValuesFrom.doc);
 
-  py::class_<RigidTransform<T>>(m, "RigidTransform")
-      .def(py::init())
+  py::class_<RigidTransform<T>>(m, "RigidTransform", doc.RigidTransform.doc)
+      .def(py::init(), doc.RigidTransform.ctor.doc)
       .def(py::init<const RotationMatrix<T>&, const Vector3<T>&>(),
-           py::arg("R"), py::arg("p"))
-      .def(py::init<const RotationMatrix<T>&>(), py::arg("R"))
-      .def(py::init<const Vector3<T>&>(), py::arg("p"))
-      .def(py::init<const Isometry3<T>&>(), py::arg("pose"))
-      .def("set", &RigidTransform<T>::set, py::arg("R"), py::arg("p"))
+           py::arg("R"), py::arg("p"), doc.RigidTransform.ctor.doc_4)
+      .def(py::init<const RotationMatrix<T>&>(), py::arg("R"),
+          doc.RigidTransform.ctor.doc_5)
+      .def(py::init<const Vector3<T>&>(), py::arg("p"),
+          doc.RigidTransform.ctor.doc_6)
+      .def(py::init<const Isometry3<T>&>(), py::arg("pose"),
+          doc.RigidTransform.ctor.doc_7)
+      .def("set", &RigidTransform<T>::set, py::arg("R"), py::arg("p"),
+          doc.RigidTransform.set.doc)
       .def("SetFromIsometry3", &RigidTransform<T>::SetFromIsometry3,
-           py::arg("pose"))
-      .def_static("Identity", &RigidTransform<T>::Identity)
-      .def("rotation", &RigidTransform<T>::rotation, py_reference_internal)
-      .def("set_rotation", &RigidTransform<T>::set_rotation, py::arg("R"))
+           py::arg("pose"), doc.RigidTransform.SetFromIsometry3.doc)
+      .def_static("Identity", &RigidTransform<T>::Identity,
+          doc.RigidTransform.Identity.doc)
+      .def("rotation", &RigidTransform<T>::rotation, py_reference_internal,
+          doc.RigidTransform.rotation.doc)
+      .def("set_rotation", &RigidTransform<T>::set_rotation, py::arg("R"),
+          doc.RigidTransform.set_rotation.doc)
       .def("translation", &RigidTransform<T>::translation,
-           py_reference_internal)
-      .def("set_translation", &RigidTransform<T>::set_translation, py::arg("p"))
-      .def("GetAsMatrix4", &RigidTransform<T>::GetAsMatrix4)
-      .def("GetAsMatrix34", &RigidTransform<T>::GetAsMatrix34)
-      .def("GetAsIsometry3", &RigidTransform<T>::GetAsIsometry3)
-      .def("SetIdentity", &RigidTransform<T>::SetIdentity)
+           py_reference_internal, doc.RigidTransform.translation.doc)
+      .def("set_translation", &RigidTransform<T>::set_translation, py::arg("p"),
+           doc.RigidTransform.set_translation.doc)
+      .def("GetAsMatrix4", &RigidTransform<T>::GetAsMatrix4,
+          doc.RigidTransform.GetAsMatrix4.doc)
+      .def("GetAsMatrix34", &RigidTransform<T>::GetAsMatrix34,
+          doc.RigidTransform.GetAsMatrix34.doc)
+      .def("GetAsIsometry3", &RigidTransform<T>::GetAsIsometry3,
+          doc.RigidTransform.GetAsIsometry3.doc)
+      .def("SetIdentity", &RigidTransform<T>::SetIdentity,
+          doc.RigidTransform.SetIdentity.doc)
       // .def("IsExactlyIdentity", ...)
       // .def("IsIdentityToEpsilon", ...)
-      .def("inverse", &RigidTransform<T>::inverse)
+      .def("inverse", &RigidTransform<T>::inverse,
+        doc.RigidTransform.inverse.doc)
       // TODO(eric.cousineau): Use `matmul` operator once we support Python3.
       .def("multiply", [](
           const RigidTransform<T>* self, const RigidTransform<T>& other) {

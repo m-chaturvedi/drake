@@ -42,7 +42,8 @@ PYBIND11_MODULE(rigid_body_plant, m) {
             py::arg("v_stiction_tolerance") =
                 Class::kDefaultVStictionTolerance,
             py::arg("characteristic_radius") =
-                Class::kDefaultCharacteristicRadius)
+                Class::kDefaultCharacteristicRadius,
+            doc.CompliantContactModelParameters.doc)
         .def_readwrite(
             "v_stiction_tolerance", &Class::v_stiction_tolerance,
             doc.CompliantContactModelParameters.v_stiction_tolerance.doc)

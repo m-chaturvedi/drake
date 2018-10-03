@@ -87,6 +87,7 @@ drake_pybind_library(
     cc_deps = [
         ":autodiff_types_pybind",
         "//bindings/pydrake/util:wrap_pybind",
+        "//bindings/pydrake:documentation_pybind",
     ],
     cc_srcs = ["autodiffutils_py.cc"],
     package_info = PACKAGE_INFO,
@@ -104,6 +105,7 @@ drake_pybind_library(
 drake_pybind_library(
     name = "automotive_py",
     cc_deps = [
+        "//bindings/pydrake:documentation_pybind",
         "//bindings/pydrake/systems:systems_pybind",
         "//bindings/pydrake/util:wrap_pybind",
     ],
@@ -127,6 +129,7 @@ drake_py_library(
 drake_pybind_library(
     name = "geometry_py",
     cc_deps = [
+        "//bindings/pydrake:documentation_pybind",
         "//lcmtypes:viewer",
     ],
     cc_so_name = "geometry",
@@ -141,6 +144,7 @@ drake_pybind_library(
 drake_pybind_library(
     name = "lcm_py",
     cc_deps = [
+        "//bindings/pydrake:documentation_pybind",
         "//bindings/pydrake/util:drake_optional_pybind",
     ],
     cc_so_name = "lcm",
@@ -153,6 +157,7 @@ drake_pybind_library(
 
 drake_pybind_library(
     name = "math_py",
+    cc_deps = ["//bindings/pydrake:documentation_pybind"],
     cc_so_name = "math",
     cc_srcs = ["math_py.cc"],
     package_info = PACKAGE_INFO,
@@ -173,6 +178,7 @@ drake_pybind_library(
     cc_deps = [
         ":symbolic_types_pybind",
         "//bindings/pydrake/util:wrap_pybind",
+        "//bindings/pydrake:documentation_pybind",
     ],
     cc_srcs = ["symbolic_py.cc"],
     package_info = PACKAGE_INFO,
@@ -187,6 +193,7 @@ drake_pybind_library(
 
 drake_pybind_library(
     name = "trajectories_py",
+    cc_deps = ["//bindings/pydrake:documentation_pybind"],
     cc_so_name = "trajectories",
     cc_srcs = ["trajectories_py.cc"],
     package_info = PACKAGE_INFO,
@@ -271,6 +278,7 @@ drake_pybind_library(
     add_install = False,
     cc_deps = [
         ":autodiff_types_pybind",
+        "//bindings/pydrake:documentation_pybind",
     ],
     cc_so_name = "test/autodiffutils_test_util",
     cc_srcs = ["test/autodiffutils_test_util_py.cc"],
@@ -292,6 +300,7 @@ drake_pybind_library(
     testonly = 1,
     add_install = False,
     cc_deps = [
+        "//bindings/pydrake:documentation_pybind",
         ":symbolic_types_pybind",
     ],
     cc_so_name = "test/odr_test_module",

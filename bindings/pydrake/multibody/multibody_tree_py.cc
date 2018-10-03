@@ -532,8 +532,7 @@ void init_multibody_plant(py::module m) {
              doc.MultibodyPlant.world_body.doc)
         .def("world_frame", &Class::world_frame, py_reference_internal,
              doc.MultibodyPlant.world_frame.doc)
-        .def("tree", &Class::tree, py_reference_internal,
-             doc.MultibodyPlant.tree.doc)
+        .def("tree", &Class::tree, py_reference_internal)
         .def("is_finalized", &Class::is_finalized,
              doc.MultibodyPlant.is_finalized.doc)
         .def("Finalize", py::overload_cast<SceneGraph<T>*>(&Class::Finalize),

@@ -21,6 +21,7 @@ PYBIND11_MODULE(acrobot, m) {
   using namespace drake::examples::acrobot;
 
   m.doc() = "Bindings for the Acrobot example.";
+  auto& doc = pydrake_doc.drake.examples.acrobot;
 
   py::module::import("pydrake.systems.framework");
 
