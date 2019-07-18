@@ -74,22 +74,24 @@ def get_all_replaced_strings(f_s):
     return [x[0] + x[1] for x in res]
 
 
-def compare_symbols_from_mkdoc(f1):
+def compare_symbols_from_mkdoc(f1, prefix):
     with open("pybind_symbols.txt", "r") as f:
         f_s = f.read()
         f_arr = f_s.split("\n")
         set1 = set(f_arr)
         set2 = set(f1)
         assert(set1.issuperset(set2))
-
+        filtered_set = set(filter(lambda x: x.startswith(prefix) ,set1))
+        assert(filtered_set.issuperset(set2))
+        print("\n".join(set.difference(filtered_set - set2)))
 
 def main():
     FILE = "/home/chaturvedi/workspace/drake-distro/bindings/pydrake/math_py.cc"
     with open(FILE, "r") as f:
         f_s = f.read()
         final_array = get_all_replaced_strings(f_s)
-        print("\n".join(final_array))
-        compare_symbols_from_mkdoc(final_array)
+        # print("\n".join(final_array))
+        compare_symbols_from_mkdoc(final_array, "pydrake_doc.drake.math")
 
 if __name__ == "__main__":
     main()
