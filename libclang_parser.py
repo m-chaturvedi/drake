@@ -139,7 +139,7 @@ def compare_symbols_from_mkdoc(symbols_to_compare, prefix=""):
             t_f_array.append(True if x in symbols_to_compare else False)
         
         print("Percentage: {}".format(100.0 * len(symbols_to_compare)/len(all_symbols_list)))
-
+        print("percentage: {}/{}".format(len(set_to_compare), len(set_doc)))
         d = {
                 "all_symbols": all_symbols_list,
                 "is_used": t_f_array
