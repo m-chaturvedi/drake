@@ -5,7 +5,7 @@ import re
 cindex.Config.set_library_path("/usr/lib/llvm-6.0/lib/")
 import pandas
 
-replace_variables = ["doc", "cls_doc", "var_doc", "cls_func_doc"]
+replace_variables = ["doc", "cls_doc", "var_doc", "enum_doc"]
 
 def var_value_search(var_name):
     re_for_search = {

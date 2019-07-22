@@ -50,7 +50,7 @@ PYBIND11_MODULE(symbolic, m) {
 
   // TODO(m-chaturvedi) Add Pybind11 documentation for operator overloads, etc.
   py::class_<Variable> var_cls(m, "Variable", doc.Variable.doc);
-  const auto& var_doc = doc.Variable;
+  constexpr auto& var_doc = doc.Variable;
   py::enum_<Variable::Type>(var_cls, "Type")
       .value(
           "CONTINUOUS", Variable::Type::CONTINUOUS, var_doc.Type.CONTINUOUS.doc)
