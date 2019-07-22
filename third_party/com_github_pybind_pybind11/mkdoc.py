@@ -97,6 +97,8 @@ SKIP_ACCESS = [
     AccessSpecifier.PRIVATE,
 ]
 
+tree_parser = []
+
 
 def utf8(s):
     # Decodes a string to utf8.
@@ -937,6 +939,7 @@ def print_symbols(f, name, node, level=0):
     if level == 0:
         modifier = "constexpr "
     iprint('{}struct /* {} */ {{'.format(modifier, name_var))
+    tree_parser.append(name_var)
     # Print documentation items.
     symbol_iter = sorted(node.doc_symbols, key=Symbol.sorting_key)
     doc_vars = choose_doc_var_names(symbol_iter)
@@ -950,12 +953,14 @@ def print_symbols(f, name, node, level=0):
         iprint('  // Source: {}:{}'.format(symbol.include, symbol.line))
         iprint('  const char* {} ={}R"""({})""";'.format(
             doc_var, delim, symbol.comment))
+        iprint("  // CUSTOM_COMMENT: " + ".".join(tree_parser + [doc_var]))
     # Recurse into child elements.
     keys = sorted(node.children_map.keys())
     for key in keys:
         child = node.children_map[key]
         print_symbols(f, key, child, level=level + 1)
     iprint('}} {};'.format(name_var))
+    tree_parser.pop()
 
 
 class FileDict(object):

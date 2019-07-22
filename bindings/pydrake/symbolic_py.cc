@@ -519,7 +519,7 @@ PYBIND11_MODULE(symbolic, m) {
       }),
           doc.Polynomial.ctor.doc_2args_e_indeterminates)
       .def("indeterminates", &Polynomial::indeterminates,
-          doc.Polynomial.indeterminates.doc, doc.Polynomial.indeterminates.doc)
+          doc.Polynomial.indeterminates.doc)
       .def("decision_variables", &Polynomial::decision_variables,
           doc.Polynomial.decision_variables.doc)
       .def("Degree", &Polynomial::Degree, doc.Polynomial.Degree.doc)

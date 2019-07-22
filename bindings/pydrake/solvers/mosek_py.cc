@@ -23,7 +23,7 @@ PYBIND11_MODULE(mosek, m) {
       .def("set_stream_logging", &MosekSolver::set_stream_logging,
           py::arg("flag"), py::arg("log_file"),
           doc.MosekSolver.set_stream_logging.doc);
-  pysolvers::BindAcquireLicense(&cls, doc.MosekSolver);
+  pysolvers::BindAcquireLicense(&cls, doc.MosekSolver.doc);
 }
 
 }  // namespace pydrake
