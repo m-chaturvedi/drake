@@ -150,7 +150,7 @@ def compare_symbols_from_mkdoc(symbols_to_compare, prefix=""):
 def main():
     print("test")
     # bindings_path = "./bindings/pydrake/multibody/plant_py.cc"
-    bindings_path = "./bindings/pydrake/**/*_py.cc"
+    bindings_path = "./bindings/pydrake/**/*.cc"
     ignore_path = "./bindings/pydrake/common/test"
     array_for_all_files = []
 
@@ -164,6 +164,6 @@ def main():
 
     compare_symbols_from_mkdoc(array_for_all_files)
     # print("\n".join(final_array))
-    
+
 if __name__ == "__main__":
     main()
