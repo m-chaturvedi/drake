@@ -102,7 +102,7 @@ def get_tokens(filename):
     en = cindex.SourceLocation.from_position(tu, FILE, lines, cols)
     extent = cindex.SourceRange.from_locations(st, en)
     tokens = tu.get_tokens(extent=extent)
-    token_spellings = [t.spelling for t in tokens]
+    token_spellings = [t.spelling for t in tokens if t.kind is not cindex.TokenKind.COMMENT]
     return token_spellings
 
 
