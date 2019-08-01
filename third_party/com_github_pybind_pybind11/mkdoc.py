@@ -249,7 +249,8 @@ attic_list = [
 ]
 
 ignore_directories = (
-    "drake/automotive"
+    "drake/automotive", "drake/common/proto", "drake/common/yaml",
+    "drake/examples"
 )
 
 def ignore_files(file_name):
