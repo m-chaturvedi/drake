@@ -248,6 +248,15 @@ attic_list = [
     "drake/systems/robotInterfaces/QPLocomotionPlan.h"
 ]
 
+ignore_directories = (
+    "drake/automotive"
+)
+
+def ignore_files(file_name):
+    return (file_name in attic_list) or \
+        (file_name.startswith(ignore_directories))
+
+
 def is_accepted_cursor(cursor, name_chain):
     """
     Determines if a symbol should be visited or not.
@@ -1077,10 +1086,11 @@ def print_symbols(f, name, node, level=0):
         iprint('  // Source: {}:{}'.format(symbol.include, symbol.line))
         iprint('  const char* {} ={}R"""({})""";'.format(
             doc_var, delim, symbol.comment))
-        if symbol.include not in attic_list:
+        if (not ignore_files(symbol.include) and \
+                set({"internal", "dev"}).isdisjoint(set(name_chain[:-1])) ):
             iprint("  // CUSTOM_COMMENT: " + ".".join(tree_parser + [doc_var]))
         else:
-            iprint("  // CUSTOM_COMMENT (ATTIC): " + ".".join(tree_parser + [doc_var]))
+            iprint("  // CUSTOM_COMMENT (ATTIC/AUTOMOTIVE/INTERNAL): " + ".".join(tree_parser + [doc_var]))
     # Recurse into child elements.
     keys = sorted(node.children_map.keys())
     for key in keys:

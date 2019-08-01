@@ -103,7 +103,8 @@ def get_tokens(filename):
     en = cindex.SourceLocation.from_position(tu, FILE, lines, cols)
     extent = cindex.SourceRange.from_locations(st, en)
     tokens = tu.get_tokens(extent=extent)
-    token_spellings = [t.spelling for t in tokens if t.kind is not cindex.TokenKind.COMMENT]
+    token_spellings = [t.spelling for t in tokens if t.kind is
+                       not cindex.TokenKind.COMMENT]
     return token_spellings
 
 
@@ -122,17 +123,25 @@ def replace_tokens_in_file(filename):
     return token_spellings, pydoc_strings
 
 
+def ignore_symbols(s):
+    solver_symbols = ['pydrake_doc.drake.solvers.MosekSolver',
+                      'pydrake_doc.drake.solvers.GurobiSolver']
+
+    startswith_symbols = ("pydrake_doc.drake.automotive")
+    return s.startswith(startswith_symbols) or \
+        s in solver_symbols
+
+
 def compare_symbols_from_mkdoc(symbols_to_compare, prefix=""):
-    pybind_file = "pybind11_without_attic.txt"
+    # pybind_file = "pybind11_without_attic_and_automotive.txt"
+    pybind_file = "pybind11_without_attic_and_automotive_and_internal.txt"
+    csv_file = "test.csv"
     with open(pybind_file, "r") as f:
         set_doc = set([line.rstrip('\n') for line in f])
 
         set_to_compare = set(symbols_to_compare)
         filtered_set = set(filter(lambda x: x.startswith(prefix), set_doc))
-
-        set_to_compare = set_to_compare - \
-            set(['pydrake_doc.drake.solvers.MosekSolver',
-                'pydrake_doc.drake.solvers.GurobiSolver'])
+        set_to_compare = [x for x in set_to_compare if not ignore_symbols(x)]
 
         if not set_doc.issuperset(set_to_compare):
             print(set_to_compare - set_doc)
@@ -150,13 +159,14 @@ def compare_symbols_from_mkdoc(symbols_to_compare, prefix=""):
                 "is_used": t_f_array
             }
         df = pandas.DataFrame(data=d)
-        df.to_csv("test.csv")
+        df.to_csv(csv_file, index=False)
 
 
 def main():
     bindings_path = "./bindings/pydrake/**/*.cc"
     ignore_path = ("./bindings/pydrake/common/test",
-                   "./bindings/pydrake/attic")
+                   "./bindings/pydrake/attic",
+                   "./bindings/pydrake/maliput")
     # bindings_path = "./bindings/pydrake/attic"
     # ignore_path = ("")
 
