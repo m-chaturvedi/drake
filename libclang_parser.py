@@ -4,6 +4,7 @@ import glob
 import re
 cindex.Config.set_library_path("/usr/lib/llvm-6.0/lib/")
 import pandas
+import pickle
 
 replace_variables = ["doc", "cls_doc", "var_doc", "enum_doc"]
 
@@ -96,7 +97,7 @@ def write_to_file(arr, file_name):
 def get_tokens(filename):
     tu = cindex.TranslationUnit.from_source(filename)
     FILE = tu.get_file(filename)
-    readlines = open("./bindings/pydrake/multibody/plant_py.cc").readlines()
+    readlines = open(filename, "r").readlines()
     lines, cols = len(readlines), len(readlines[-1])
     st = cindex.SourceLocation.from_position(tu, FILE, 1, 1)
     en = cindex.SourceLocation.from_position(tu, FILE, lines, cols)
@@ -122,11 +123,16 @@ def replace_tokens_in_file(filename):
 
 
 def compare_symbols_from_mkdoc(symbols_to_compare, prefix=""):
-    with open("pybind_symbols.txt", "r") as f:
-        set_doc = set(f.read().split("\n"))
+    pybind_file = "pybind11_without_attic.txt"
+    with open(pybind_file, "r") as f:
+        set_doc = set([line.rstrip('\n') for line in f])
 
         set_to_compare = set(symbols_to_compare)
         filtered_set = set(filter(lambda x: x.startswith(prefix), set_doc))
+
+        set_to_compare = set_to_compare - \
+            set(['pydrake_doc.drake.solvers.MosekSolver',
+                'pydrake_doc.drake.solvers.GurobiSolver'])
 
         if not set_doc.issuperset(set_to_compare):
             print(set_to_compare - set_doc)
@@ -137,7 +143,6 @@ def compare_symbols_from_mkdoc(symbols_to_compare, prefix=""):
         all_symbols_list.sort()
         for x in all_symbols_list:
             t_f_array.append(True if x in symbols_to_compare else False)
-        
         print("Percentage: {}".format(100.0 * len(symbols_to_compare)/len(all_symbols_list)))
         print("percentage: {}/{}".format(len(set_to_compare), len(set_doc)))
         d = {
@@ -147,11 +152,14 @@ def compare_symbols_from_mkdoc(symbols_to_compare, prefix=""):
         df = pandas.DataFrame(data=d)
         df.to_csv("test.csv")
 
+
 def main():
-    print("test")
-    # bindings_path = "./bindings/pydrake/multibody/plant_py.cc"
     bindings_path = "./bindings/pydrake/**/*.cc"
-    ignore_path = "./bindings/pydrake/common/test"
+    ignore_path = ("./bindings/pydrake/common/test",
+                   "./bindings/pydrake/attic")
+    # bindings_path = "./bindings/pydrake/attic"
+    # ignore_path = ("")
+
     array_for_all_files = []
 
     for f in glob.iglob(bindings_path, recursive=True):
@@ -162,8 +170,10 @@ def main():
         _, final_array = replace_tokens_in_file(f)
         array_for_all_files = array_for_all_files + final_array
 
+    # A = pickle.load(open("parse_pybind_strings.pickle", "rb"))
+    # assert(set(A) == set(array_for_all_files))
     compare_symbols_from_mkdoc(array_for_all_files)
-    # print("\n".join(final_array))
+
 
 if __name__ == "__main__":
     main()
