@@ -14,9 +14,13 @@ import re
 import shutil
 import sys
 import textwrap
+from pprint import pprint as pp
 
+import pickle
+import xml.etree.ElementTree as ET
 from clang import cindex
 from clang.cindex import AccessSpecifier, CursorKind, TypeKind
+cindex.Config.set_library_path("/usr/lib/llvm-6.0/lib/")
 
 CLASS_KINDS = [
     CursorKind.CLASS_DECL,
@@ -31,7 +35,6 @@ FUNCTION_KINDS = [
     CursorKind.CXX_METHOD,
     CursorKind.CONSTRUCTOR,
 ]
-
 
 RECURSE_LIST = [
     CursorKind.TRANSLATION_UNIT,
@@ -1043,6 +1046,7 @@ def choose_doc_var_names(symbols):
     # As a last resort, return a random one, with a bogus name.
     return failure_result
 
+tree_parser_xpath = [ET.Element("Root")]
 
 def print_symbols(f, name, node, level=0):
     """
@@ -1073,7 +1077,20 @@ def print_symbols(f, name, node, level=0):
     if level == 0:
         modifier = "constexpr "
     iprint('{}struct /* {} */ {{'.format(modifier, name_var))
+
+    root = tree_parser_xpath[-1]
+    kind = node.first_symbol.cursor.kind if node.first_symbol else None
+    new_ele = ET.SubElement(root, "Node", {
+        "kind" : str(kind),
+        "name"     : name_var,
+        "full_name": full_name,
+        "ignore": str(0),
+        "doc_var" : ""
+        })
+    
+    tree_doc_var_xpath = []
     tree_parser.append(name_var)
+    iprint('// CURSOR KIND: {}'.format(str(kind)))
     # Print documentation items.
     symbol_iter = sorted(node.doc_symbols, key=Symbol.sorting_key)
     doc_vars = choose_doc_var_names(symbol_iter)
@@ -1087,18 +1104,26 @@ def print_symbols(f, name, node, level=0):
         iprint('  // Source: {}:{}'.format(symbol.include, symbol.line))
         iprint('  const char* {} ={}R"""({})""";'.format(
             doc_var, delim, symbol.comment))
+        tree_doc_var = ".".join(tree_parser + [doc_var])
+        tree_doc_var_xpath.append(tree_doc_var)
         if (not ignore_files(symbol.include) and \
                 set({"internal", "dev"}).isdisjoint(set(name_chain[:-1])) ):
-            iprint("  // CUSTOM_COMMENT: " + ".".join(tree_parser + [doc_var]))
+            iprint("  // CUSTOM_COMMENT: " + tree_doc_var)
         else:
-            iprint("  // CUSTOM_COMMENT (ATTIC/AUTOMOTIVE/INTERNAL): " + ".".join(tree_parser + [doc_var]))
+            iprint("  // CUSTOM_COMMENT (ATTIC/AUTOMOTIVE/INTERNAL): " + tree_doc_var)
+            new_ele.attrib["ignore"] = str(1)
+ 
+    new_ele.attrib["doc_var"] = ",".join(tree_doc_var_xpath)
+    tree_parser_xpath.append(new_ele)
     # Recurse into child elements.
     keys = sorted(node.children_map.keys())
     for key in keys:
         child = node.children_map[key]
         print_symbols(f, key, child, level=level + 1)
     iprint('}} {};'.format(name_var))
+
     tree_parser.pop()
+    tree_parser_xpath.pop()
 
 
 class FileDict(object):
@@ -1125,6 +1150,16 @@ class FileDict(object):
     def __setitem__(self, file, value):
         key = self._key(file)
         self._d[key] = value
+
+from xml.dom import minidom
+# from pprint import pprint as pp
+
+def prettify(elem):
+    """Return a pretty-printed XML string for the Element.
+    """
+    rough_string = ET.tostring(elem, 'utf-8')
+    reparsed = minidom.parseString(rough_string)
+    return reparsed.toprettyxml(indent="  ")
 
 
 def main():
@@ -1175,6 +1210,10 @@ def main():
         sys.exit(1)
 
     f = open(output_filename, 'w')
+    # Temporarily disable writing
+    old_write = f.write
+    f.write = lambda x: None
+
     # N.B. We substitute the `GENERATED FILE...` bits in this fashion because
     # otherwise Reviewable gets confused.
     f.write('''#pragma once
@@ -1261,12 +1300,13 @@ If you are on Ubuntu, please ensure you have en_US.UTF-8 locales generated:
     sudo locale-gen en_US.UTF-8
 """.format(e), file=sys.stderr)
         sys.exit(1)
-
     f.write('''
 #if defined(__GNUG__)
 #pragma GCC diagnostic pop
 #endif
 ''')
+    f.write = old_write
+    f.write(prettify(tree_parser_xpath[0]))
 
 
 if __name__ == '__main__':
