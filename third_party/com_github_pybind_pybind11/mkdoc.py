@@ -16,6 +16,7 @@ import sys
 import textwrap
 from pprint import pprint as pp
 
+from xml.dom import minidom
 import pickle
 import xml.etree.ElementTree as ET
 from clang import cindex
@@ -124,6 +125,7 @@ class Symbol(object):
 def eprint(*args):
     print(*args, file=sys.stderr)
 
+
 attic_list = [
     "drake/manipulation/scene_generation/simulate_plant_to_rest.h",
     "drake/manipulation/scene_generation/random_clutter_generator.h",
@@ -213,11 +215,15 @@ attic_list = [
     "drake/systems/controllers/rbt_inverse_dynamics_controller.h",
     "drake/systems/controllers/rbt_inverse_dynamics.h",
     "drake/systems/controllers/polynomial_encode_decode.h",
-    "drake/systems/controllers/qp_inverse_dynamics/qp_output_translator_system.h",
+    "drake/systems/controllers/qp_inverse_dynamics/"
+    "qp_output_translator_system.h",
     "drake/systems/controllers/qp_inverse_dynamics/robot_kinematic_state.h",
-    "drake/systems/controllers/qp_inverse_dynamics/robot_kinematic_state_translator_system.h",
-    "drake/systems/controllers/qp_inverse_dynamics/qp_inverse_dynamics_common.h",
-    "drake/systems/controllers/qp_inverse_dynamics/qp_inverse_dynamics_system.h",
+    "drake/systems/controllers/qp_inverse_dynamics/"
+    "robot_kinematic_state_translator_system.h",
+    "drake/systems/controllers/qp_inverse_dynamics/"
+    "qp_inverse_dynamics_common.h",
+    "drake/systems/controllers/qp_inverse_dynamics/"
+    "qp_inverse_dynamics_system.h",
     "drake/systems/controllers/qp_inverse_dynamics/deprecated.h",
     "drake/systems/controllers/qp_inverse_dynamics/lcm_utils.h",
     "drake/systems/controllers/qp_inverse_dynamics/qp_inverse_dynamics.h",
@@ -239,9 +245,12 @@ attic_list = [
     "drake/systems/sensors/rgbd_camera.h",
     "drake/systems/sensors/depth_sensor_to_lcm_point_cloud_message.h",
     "drake/systems/sensors/depth_sensor_output.h",
-    "drake/systems/trajectory_optimization/generalized_constraint_force_evaluator.h",
-    "drake/systems/trajectory_optimization/position_constraint_force_evaluator.h",
-    "drake/systems/trajectory_optimization/joint_limit_constraint_force_evaluator.h",
+    "drake/systems/trajectory_optimization/"
+    "generalized_constraint_force_evaluator.h",
+    "drake/systems/trajectory_optimization/"
+    "position_constraint_force_evaluator.h",
+    "drake/systems/trajectory_optimization/"
+    "joint_limit_constraint_force_evaluator.h",
     "drake/systems/robotInterfaces/BodyMotionData.h",
     "drake/systems/robotInterfaces/atlasUtil.h",
     "drake/systems/robotInterfaces/verify_subtype_sizes.h",
@@ -253,6 +262,7 @@ ignore_directories = (
     "drake/automotive", "drake/common/proto", "drake/common/yaml",
     "drake/examples"
 )
+
 
 def ignore_files(file_name):
     return (file_name in attic_list) or \
@@ -1044,9 +1054,11 @@ def choose_doc_var_names(symbols):
     # As a last resort, return a random one, with a bogus name.
     return failure_result
 
+
 # A different parsing variable is needed for doc.
 tree_parser_doc = []
 tree_parser_xpath = [ET.Element("Root")]
+
 
 def print_symbols(f, name, node, level=0):
     """
@@ -1105,22 +1117,23 @@ def print_symbols(f, name, node, level=0):
         tree_doc_var_xpath.append(tree_doc_var)
         symbol_include_xpath.append(symbol.include)
 
-	# Check if the symbol must be ignored.
-        if (not ignore_files(symbol.include) and \
-                set({"internal", "dev"}).isdisjoint(set(name_chain[:-1])) ):
+        # Check if the symbol must be ignored.
+        if (not ignore_files(symbol.include) and
+                set({"internal", "dev"}).isdisjoint(set(name_chain[:-1]))):
             ignore_xpath.append(str(0))
         else:
             ignore_xpath.append(str(1))
 
-    for d, i, s in zip(tree_doc_var_xpath or [""], ignore_xpath or [""],
+    for d, i, s in zip(
+            tree_doc_var_xpath or [""], ignore_xpath or [""],
             symbol_include_xpath or [""]):
 
         new_ele = ET.SubElement(root, "Node", {
-            "kind" : str(kind),
-            "name"     : name_var,
+            "kind": str(kind),
+            "name": name_var,
             "full_name": full_name,
             "ignore": i,
-            "doc_var" : d,
+            "doc_var": d,
             "file_name": s,
             })
 
@@ -1161,7 +1174,6 @@ class FileDict(object):
         key = self._key(file)
         self._d[key] = value
 
-from xml.dom import minidom
 
 def prettify(elem):
     """Return a pretty-printed XML string for the Element.
@@ -1224,7 +1236,6 @@ def main():
 
     f = open(output_filename, 'w')
     f_xml = open(output_filename_xml, 'w')
-
 
     # N.B. We substitute the `GENERATED FILE...` bits in this fashion because
     # otherwise Reviewable gets confused.

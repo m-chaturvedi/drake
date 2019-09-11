@@ -373,6 +373,7 @@ generate_pybind_documentation_header(
     name = "generate_deprecation_example_class_documentation",
     testonly = 1,
     out = "test/deprecation_example/example_class_documentation.h",
+    out_xml = "test/deprecation_example/example_class_documentation_xml.h",
     targets = [":deprecation_example_class"],
 )
 

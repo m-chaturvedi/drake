@@ -55,13 +55,13 @@ drake_py_library(
 generate_pybind_documentation_header(
     name = "generate_pybind_documentation_header",
     out = "documentation_pybind.h",
-    out_xml = "documentation_pybind_xml.h",
     exclude_hdr_patterns = [
         "drake/common/text_logging_gflags.h",
         # Exclude LCM-generated classes to reduce size of generated
         # docstrings.
         "drake/lcmtypes/**",
     ],
+    out_xml = "documentation_pybind_xml.h",
     root_name = "pydrake_doc",
     targets = [
         "//:drake_shared_library",
