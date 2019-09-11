@@ -187,6 +187,12 @@ def make_tree(file_coverage, sep="/"):
 
 
 def add_directory_coverage(df):
+    """Makes an XML tree from filenames and their coverage and then uses it
+       to get directory coverage whenever there's a change in the immediate
+       parent of the leaf (i.e. the header file) a row of the dataframe.
+
+    :param df: Pandas dataframe containing the coverage details.
+    """
     filenames, coverage = df.loc[:, "FileName"], df.loc[:, "Coverage"]
     file_coverage = dict(zip(filenames, coverage))
     root = make_tree(file_coverage)
@@ -225,8 +231,6 @@ def prune_dataframe(df, keep_cols):
     new_df = df[keep_cols].copy()
     for key in print_kinds:
         val = print_kinds[key]
-        # col = df.loc[:, val].sum(axis='columns').tolist()[:]
-        # new_df.loc[:, key] = col
         new_df[key] = df.loc[:, val].sum(axis='columns')
     return new_df
 

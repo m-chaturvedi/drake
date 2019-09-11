@@ -1098,7 +1098,6 @@ def print_symbols(f, name, node, level=0):
     tree_doc_var_xpath, ignore_xpath, symbol_include_xpath = [], [], []
     tree_parser_doc.append(name_var)
 
-    iprint('// CURSOR KIND: {}'.format(str(kind)))
     # Print documentation items.
     symbol_iter = sorted(node.doc_symbols, key=Symbol.sorting_key)
     doc_vars = choose_doc_var_names(symbol_iter)
