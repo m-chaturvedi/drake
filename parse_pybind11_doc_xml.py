@@ -177,7 +177,7 @@ def make_tree(file_coverage, sep="/"):
         comps = re.split(os.sep, s)
         r = root
         for c in comps:
-            if not r.find(c):
+            if r.find(c) is None:
                 num = file_coverage[s].num if c.endswith(".h") else 0
                 den = file_coverage[s].den if c.endswith(".h") else 0
                 r = SE(r, c, {"num": str(num), "den": str(den)})
