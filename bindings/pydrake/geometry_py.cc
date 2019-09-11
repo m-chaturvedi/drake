@@ -341,7 +341,7 @@ void DoScalarIndependentDefinitions(py::module m) {
   constexpr auto& doc = pydrake_doc.drake.geometry;
   BindIdentifier<SourceId>(m, "SourceId", doc.SourceId.doc);
   BindIdentifier<FrameId>(m, "FrameId", doc.FrameId.doc);
-  BindIdentifier<eometryId>(m, "GeometryId", doc.GeometryId.doc);
+  BindIdentifier<GeometryId>(m, "GeometryId", doc.GeometryId.doc);
 
   {
     constexpr auto& cls_doc = doc.Role;
