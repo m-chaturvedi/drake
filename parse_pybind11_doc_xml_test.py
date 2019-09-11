@@ -34,9 +34,10 @@ class TestXML(unittest.TestCase):
     def test_previous_docstrings(root):
         """Tests the docstrings obtained with previous approaches
 
-        :root: Root for the XML tree
-        :returns: boolean
+        Args:
+                root: Root for the XML tree
 
+        Returns: A boolean
         """
 
         tree = ET.parse('bazel-bin/bindings/pydrake/documentation_pybind_xml.h')

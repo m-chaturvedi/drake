@@ -32,7 +32,7 @@ all_kinds = [
 
 # Not used: {'CursorKind.FIELD_DECL', 'CursorKind.TYPEDEF_DECL'}
 # Note that the figures given in the coverage column may not be the sum of the
-# figures in other columns.
+# figures in the types column because we're not using two types.
 print_kinds = {
     "Class": ['CursorKind.CLASS_DECL', 'CursorKind.STRUCT_DECL'],
     "Class Template": ["CursorKind.CLASS_TEMPLATE"],
@@ -61,6 +61,29 @@ class Coverage(object):
     def __eq__(self, ot): return self.num == ot.num and self.den == ot.den
 
     def val(self): return (float)(self.num) / self.den
+
+    def __getattr__(self, attr):
+        raise AttributeError("'{}' object has no attribute '{}'".format(
+            self.__class__.__name__, attr))
+
+
+class FileName(object):
+
+    def __init__(self, s, *args, **kwargs): self.s = str(s, *args, **kwargs)
+
+    def __str__(self): return self.s
+
+    def __lt__(self, other):
+        L1 = self.s.split(os.path.sep)
+        L2 = other.s.split(os.path.sep)
+        if len(L1) <= 1 or len(L2) <= 1:
+            return self.s < other.s
+
+        return L1[:-1] < L2[:-1] if L1[:-1] != L2[:-1] else L1[-1] < L2[-1]
+
+    def __getattr__(self, attr):
+        raise AttributeError("'{}' object has no attribute '{}'".format(
+            self.__class__.__name__, attr))
 
 
 def get_pandas_row_for_nodes(nodes, pybind_strings):
@@ -130,7 +153,7 @@ def get_file_coverage(file_nodes, pybind_strings, df):
         assert(len(doc_nodes) == len(file_name_dict[fn]))
         row = get_pandas_row_for_nodes(doc_nodes, pybind_strings)
 
-        row["FileName"] = fn
+        row["FileName"] = FileName(fn)
         df = df.append(row, ignore_index=True)
 
     return df
@@ -174,7 +197,7 @@ def make_tree(file_coverage, sep="/"):
     root = ET.Element("Root")
     SE = ET.SubElement
     for s in file_coverage:
-        comps = re.split(os.sep, s)
+        comps = str(s).split(os.sep)
         r = root
         for c in comps:
             if r.find(c) is None:
@@ -202,8 +225,8 @@ def add_directory_coverage(df):
 
     for i, row in df.iterrows():
         total_num, total_den = 0, 0
-        if dirname != os.path.dirname(row["FileName"]):
-            dirname = os.path.dirname(row["FileName"])
+        if dirname != os.path.dirname(str(row["FileName"])):
+            dirname = os.path.dirname(str(row["FileName"]))
             total_num = sum([int(n) for n in XP('.//{}/*/@num'.format(dirname))])
             total_den = sum([int(d) for d in XP('.//{}/*/@den'.format(dirname))])
         row["DirCoverage"] = Coverage(total_num, total_den)
