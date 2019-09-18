@@ -1,3 +1,6 @@
+# This file parses the python bindings files and extracts the doc variables
+# using libclang.
+
 # KNOWN ASSUMPTIONS:
 # 1. No shadowing for line-wise variable replacement.
 # 2. The `doc` variables are always defined like so:

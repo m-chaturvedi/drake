@@ -40,18 +40,18 @@ PYBIND11_MODULE(rigid_body_tree, m) {
   py::module::import("pydrake.attic.multibody.shapes");
   py::module::import("pydrake.common.eigen_geometry");
 
-  constexpr auto& var_doc = doc.drake.multibody.joints;
+  constexpr auto& joints_doc = doc.drake.multibody.joints;
   py::enum_<FloatingBaseType>(
       m, "FloatingBaseType", doc.drake.multibody.joints.FloatingBaseType.doc)
       .value("kFixed", FloatingBaseType::kFixed,
-          var_doc.FloatingBaseType.kFixed.doc)
+          joints_doc.FloatingBaseType.kFixed.doc)
       .value("kRollPitchYaw", FloatingBaseType::kRollPitchYaw,
-          var_doc.FloatingBaseType.kRollPitchYaw.doc)
+          joints_doc.FloatingBaseType.kRollPitchYaw.doc)
       .value("kQuaternion", FloatingBaseType::kQuaternion,
-          var_doc.FloatingBaseType.kQuaternion.doc)
+          joints_doc.FloatingBaseType.kQuaternion.doc)
       .value("kExperimentalMultibodyPlantStyle",
           FloatingBaseType::kExperimentalMultibodyPlantStyle,
-          var_doc.FloatingBaseType.kExperimentalMultibodyPlantStyle.doc);
+          joints_doc.FloatingBaseType.kExperimentalMultibodyPlantStyle.doc);
 
   // TODO(eric.cousineau): Try to decouple these APIs so that `rigid_body_tree`
   // and `parsers` do not form a dependency cycle.
@@ -520,55 +520,58 @@ PYBIND11_MODULE(rigid_body_tree, m) {
       .def("get_transform_to_body",
           &RigidBodyFrame<double>::get_transform_to_body,
           doc.RigidBodyFrame.get_transform_to_body.doc);
-  {
-    constexpr auto& cls_doc = doc.drake.parsers;
-    m.def("AddModelInstanceFromUrdfFile",
-        [](const std::string& urdf_filename,
-            const FloatingBaseType floating_base_type,
-            shared_ptr<RigidBodyFrame<double>> weld_to_frame,
-            RigidBodyTree<double>* tree, bool do_compile) {
-          return parsers::urdf::AddModelInstanceFromUrdfFile(urdf_filename,
-              floating_base_type, weld_to_frame, do_compile, tree);
-        },
-        py::arg("urdf_filename"), py::arg("floating_base_type"),
-        py::arg("weld_to_frame"), py::arg("tree"), py::arg("do_compile") = true,
-        cls_doc.urdf.AddModelInstanceFromUrdfFile.doc_deprecated_5args);
 
-    m.def("AddModelInstanceFromUrdfStringSearchingInRosPackages",
-        py::overload_cast<const std::string&, const PackageMap&,
-            const std::string&, const FloatingBaseType,
-            shared_ptr<RigidBodyFrame<double>>,
-            RigidBodyTree<double>*>(
-            &parsers::urdf::  // BR
-            AddModelInstanceFromUrdfStringSearchingInRosPackages),
-        cls_doc.urdf.AddModelInstanceFromUrdfStringSearchingInRosPackages.doc);
-    m.def("AddModelInstancesFromSdfFile",
-        [](const std::string& sdf_filename,
-            const FloatingBaseType floating_base_type,
-            std::shared_ptr<RigidBodyFrame<double>> weld_to_frame,
-            RigidBodyTree<double>* tree, bool do_compile) {
-          return sdf::AddModelInstancesFromSdfFile(sdf_filename,
-              floating_base_type, weld_to_frame, do_compile, tree);
-        },
-        py::arg("sdf_filename"), py::arg("floating_base_type"),
-        py::arg("weld_to_frame"), py::arg("tree"), py::arg("do_compile") = true,
-        cls_doc.sdf.AddModelInstancesFromSdfFile.doc);
-    m.def("AddModelInstancesFromSdfString",
-        py::overload_cast<const std::string&, const FloatingBaseType,
-            shared_ptr<RigidBodyFrame<double>>, RigidBodyTree<double>*>(
-            &sdf::AddModelInstancesFromSdfString),
-        cls_doc.sdf.AddModelInstancesFromSdfString.doc);
-    m.def("AddModelInstancesFromSdfStringSearchingInRosPackages",
-        py::overload_cast<const std::string&, const PackageMap&,
-            const FloatingBaseType, shared_ptr<RigidBodyFrame<double>>,
-            RigidBodyTree<double>*>(
-            &sdf::  // BR
-            AddModelInstancesFromSdfStringSearchingInRosPackages),
-        cls_doc.sdf.AddModelInstancesFromSdfStringSearchingInRosPackages.doc);
-    m.def("AddFlatTerrainToWorld", &multibody::AddFlatTerrainToWorld,
-        py::arg("tree"), py::arg("box_size") = 1000, py::arg("box_depth") = 10,
-        doc.drake.multibody.AddFlatTerrainToWorld.doc);
-  }
+  const char* const doc_AddModelInstanceFromUrdfFile =
+      doc.drake.parsers.urdf.AddModelInstanceFromUrdfFile.doc_deprecated_5args;
+  m.def("AddModelInstanceFromUrdfFile",
+      [](const std::string& urdf_filename,
+          const FloatingBaseType floating_base_type,
+          shared_ptr<RigidBodyFrame<double>> weld_to_frame,
+          RigidBodyTree<double>* tree, bool do_compile) {
+        return parsers::urdf::AddModelInstanceFromUrdfFile(
+            urdf_filename, floating_base_type, weld_to_frame, do_compile, tree);
+      },
+      py::arg("urdf_filename"), py::arg("floating_base_type"),
+      py::arg("weld_to_frame"), py::arg("tree"), py::arg("do_compile") = true,
+      doc_AddModelInstanceFromUrdfFile);
+
+  m.def("AddModelInstanceFromUrdfStringSearchingInRosPackages",
+      py::overload_cast<const std::string&, const PackageMap&,
+          const std::string&, const FloatingBaseType,
+          shared_ptr<RigidBodyFrame<double>>,
+          RigidBodyTree<double>*>(
+          &parsers::urdf::  // BR
+          AddModelInstanceFromUrdfStringSearchingInRosPackages),
+      doc.drake.parsers.urdf
+          .AddModelInstanceFromUrdfStringSearchingInRosPackages.doc);
+  m.def("AddModelInstancesFromSdfFile",
+      [](const std::string& sdf_filename,
+          const FloatingBaseType floating_base_type,
+          std::shared_ptr<RigidBodyFrame<double>> weld_to_frame,
+          RigidBodyTree<double>* tree, bool do_compile) {
+        return sdf::AddModelInstancesFromSdfFile(
+            sdf_filename, floating_base_type, weld_to_frame, do_compile, tree);
+      },
+      py::arg("sdf_filename"), py::arg("floating_base_type"),
+      py::arg("weld_to_frame"), py::arg("tree"), py::arg("do_compile") = true,
+      doc.drake.parsers.sdf.AddModelInstancesFromSdfFile.doc);
+  m.def("AddModelInstancesFromSdfString",
+      py::overload_cast<const std::string&, const FloatingBaseType,
+          shared_ptr<RigidBodyFrame<double>>, RigidBodyTree<double>*>(
+          &sdf::AddModelInstancesFromSdfString),
+      doc.drake.parsers.sdf.AddModelInstancesFromSdfString.doc);
+  m.def("AddModelInstancesFromSdfStringSearchingInRosPackages",
+      py::overload_cast<const std::string&, const PackageMap&,
+          const FloatingBaseType, shared_ptr<RigidBodyFrame<double>>,
+          RigidBodyTree<double>*>(
+          &sdf::  // BR
+          AddModelInstancesFromSdfStringSearchingInRosPackages),
+      doc.drake.parsers.sdf.AddModelInstancesFromSdfStringSearchingInRosPackages
+          .doc);
+  m.def("AddFlatTerrainToWorld", &multibody::AddFlatTerrainToWorld,
+      py::arg("tree"), py::arg("box_size") = 1000, py::arg("box_depth") = 10,
+      doc.drake.multibody.AddFlatTerrainToWorld.doc);
+
   py::class_<RigidBodyActuator>(
       m, "RigidBodyActuator", doc.RigidBodyActuator.doc)
       .def_readonly(

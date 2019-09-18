@@ -69,7 +69,7 @@ class Coverage(object):
 
 class FileName(object):
 
-    def __init__(self, s, *args, **kwargs): self.s = str(s, *args, **kwargs)
+    def __init__(self, s): self.s = str(s)
 
     def __str__(self): return self.s
 
