@@ -199,11 +199,15 @@ def make_tree(file_coverage, sep="/"):
     for s in file_coverage:
         comps = str(s).split(os.sep)
         r = root
-        for c in comps:
+        for ind, c in enumerate(comps):
             if r.find(c) is None:
                 num = file_coverage[s].num if c.endswith(".h") else 0
                 den = file_coverage[s].den if c.endswith(".h") else 0
-                r = SE(r, c, {"num": str(num), "den": str(den)})
+                r = SE(r, c, {
+                               "num": str(num),
+                               "den": str(den),
+                               "name": (os.sep).join(comps[:ind+1])
+                            })
             else:
                 r = r.find(c)
     return root
@@ -243,6 +247,7 @@ def add_directory_coverage(df):
     final_row["FileName"] = "TOTAL"
     df = df.append(final_row, ignore_index=True)
     df.to_csv("file_coverage.csv", index=False)
+    return df
 
 
 def prune_dataframe(df, keep_cols):
@@ -265,7 +270,8 @@ def get_all_file_coverage(root, pybind_strings, prune=True):
     df_sorted = df.sort_values(by=['FileName'])
     df_pruned = prune_dataframe(df_sorted, [
         "DirCoverage", "FileName", "Coverage"])
-    add_directory_coverage(df_pruned if prune else df_sorted)
+    final_df = add_directory_coverage(df_pruned if prune else df_sorted)
+    return final_df
 
 
 def main():
@@ -274,7 +280,8 @@ def main():
     root = tree.getroot()
     pybind_strings = libclang_parser.get_docstring_for_all_bindings()
     get_all_class_coverage(root, pybind_strings, prune=True)
-    get_all_file_coverage(root, pybind_strings, prune=True)
+    file_coverage_df = get_all_file_coverage(root, pybind_strings, prune=True)
+    return file_coverage_df
 
 
 if __name__ == "__main__":

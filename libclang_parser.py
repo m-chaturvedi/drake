@@ -214,14 +214,6 @@ def get_docstring_for_all_bindings():
 
 def main():
     array_for_all_files = get_docstring_for_all_bindings()
-    #  A = pickle.load(open("parse_pybind_strings.pickle", "rb"))
-    #  if set(A) != set(array_for_all_files):
-    #      __import__('pdb').set_trace()
-    #  assert(set(A) == set(array_for_all_files))
-    #
-    #  pickle.dump(array_for_all_files, open(
-    #      "libclang_parser_docstrings.txt", "wb"))
-
 
 if __name__ == "__main__":
     main()
