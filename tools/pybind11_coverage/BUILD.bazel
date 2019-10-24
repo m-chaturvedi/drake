@@ -1,0 +1,74 @@
+
+
+# genquery(
+#         name = "gen_pybind_srcs",
+#         # expression = 'labels("srcs", kind(cc_.*, //bindings:pydrake except kind(".*_test rule", //bindings:pydrake)))',
+#         expression = 'labels("srcs", attr(tags, "pybind11_library",deps(//bindings/pydrake:pydrake)))',
+#         scope = ["//bindings/pydrake:pydrake"],
+# )
+
+# genrule(
+#         name = "bzlquery",
+#         tools = [":gen_pybind_srcs"],
+#         cmd = "cat $(location :gen_pybind_srcs) | while read l; echo $(location $l); done > $@",
+#         outs = ["output.txt"]
+# )
+#
+# filegroup(
+#         name = "fgroup",
+#         srcs = [":gen_pybind_srcs"],
+# )
+#
+# drake_py_binary(
+#         name = "parse_doc_xml",
+#         srcs = [
+#                 "parse_pybind11_doc_xml.py",
+#         ],
+#         deps = [
+#                 "//bindings/pydrake:pydrake"
+#             ],
+# )
+#
+# genrule(
+#     name = "genrule",
+#     srcs = [":gen_pybind_srcs"],
+#     outs = ["genrule.txt"],
+#     cmd = "cat $(SRCS) > $@",
+# )
+#
+# genrule(name = "run_parse_doc_xml",
+#         tools = [":bzlquery", ":parse_doc_xml", "//bindings/pydrake:documentation_pybind_xml", "fgroup"],
+#         srcs =[":gen_pybind_srcs"],
+#         outs = ["class_coverage.txt", "file_coverage.txt"],
+#         cmd = "$(locations :parse_doc_xml) $(location //bindings/pydrake:documentation_pybind_xml) $(locations :gen_pybind_srcs)",
+# )
+
+# drake_py_binary(name = "run_parse_doc_xml",
+#         tools = [":parse_doc_xml", ":gen_pybind_srcs"],
+#         srcs =[":gen_pybind_srcs"],
+#         outs = ["class_coverage.py", "file_coverage.py"],
+#         cmd = "'$(location :parse_doc_xml)' --pybind_xml='drake/bindings/pydrake/documentation_pybind_xml.h)' $(SRCS)",
+# )
+
+# genrule(
+#         name = "genrule",
+#         srcs = [":srcs", "//bindings/pydrake:documentation_pybind"],
+#         outs = ["genrules.txt"],
+#         # cmd = "cat $(locations //tools/pybind11_coverage:gen_pybind_srcs) > $@",
+#         cmd = "$(locations :srcs) $(locations //bindings/pydrake:documentation_pybind) > $@",
+# )
+
+# filegroup(
+#         name = "srcs",
+#         srcs = [
+#                 "//tools/pybind11_coverage:gen_pybind_srcs"
+#         ],
+#         deps = [PY_LIBRARIES_WITH_INSTALL + PY_LIBRARIES]
+# )
+
+py_binary(
+    name = "parse_pybind11_doc_xml",
+    srcs = ["parse_pybind11_doc_xml.py"],
+    visibility = ["//visibility:public"],
+)
+

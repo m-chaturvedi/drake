@@ -13,6 +13,8 @@ load(
     "drake_py_unittest",
 )
 load("//bindings/pydrake:pydrake.bzl", "add_lint_tests_pydrake")
+load("@drake//tools/pybind11_coverage:transitive_rule.bzl",
+     "add_for_pybind_coverage")
 
 package(default_visibility = [
     "//bindings/pydrake:__subpackages__",
@@ -208,4 +210,5 @@ drake_py_unittest(
     ],
 )
 
+add_for_pybind_coverage()
 add_lint_tests_pydrake()

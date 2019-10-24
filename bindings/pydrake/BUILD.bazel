@@ -23,6 +23,11 @@ load(
 )
 load("//bindings/pydrake:pydrake.bzl", "add_lint_tests_pydrake")
 
+load(
+     "@drake//tools/pybind11_coverage:transitive_rule.bzl",
+     "add_for_pybind_coverage", "main_globber"
+)
+
 package(default_visibility = [
     "//bindings:__subpackages__",
 ])
@@ -80,6 +85,12 @@ drake_cc_library(
     hdrs = ["documentation_pybind.h"],
     declare_installed_headers = 0,
     tags = ["nolint"],
+)
+
+filegroup(
+    name = "documentation_pybind_xml",
+    srcs = ["documentation_pybind_xml.h"],
+    visibility = ["//visibility:public"],
 )
 
 drake_cc_library(
@@ -498,3 +509,18 @@ add_lint_tests_pydrake(
         ":test/common_install_test.py",
     ],
 )
+
+main_globber(
+        name = "pybind_cc_glob",
+        deps = [
+            ":cc_glob",
+            "//bindings/pydrake/common:cc_glob",
+            "//bindings/pydrake/examples:cc_glob",
+            "//bindings/pydrake/multibody:cc_glob",
+            "//bindings/pydrake/manipulation:cc_glob",
+            "//bindings/pydrake/solvers:cc_glob",
+            "//bindings/pydrake/systems:cc_glob",
+        ]
+)
+
+add_for_pybind_coverage()

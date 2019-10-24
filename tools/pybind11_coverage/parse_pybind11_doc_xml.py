@@ -1,8 +1,13 @@
+#!/usr/bin/env python3
 from lxml import etree as ET
+import pickle
 import pandas
+import re
 import os
+from fractions import Fraction
 from xml.dom import minidom
 import libclang_parser
+import argparse
 
 XPATHS = {
     "class_decl": ".//Node[@kind='CursorKind.CLASS_DECL' or "
@@ -243,7 +248,6 @@ def add_directory_coverage(df):
 
     final_row["FileName"] = "TOTAL"
     df = df.append(final_row, ignore_index=True)
-    print("Coverage = {}".format(str(final_row["Coverage"])))
     df.to_csv("file_coverage.csv", index=False)
     return df
 
@@ -273,8 +277,16 @@ def get_all_file_coverage(root, pybind_strings, prune=True):
 
 
 def main():
-    tree = ET.parse('bazel-bin/bindings/pydrake/documentation_pybind_xml.h')
-
+    import sys
+    assert len(sys.argv) >= 1
+    output = open(sys.argv[1], "wt")
+    for path in sys.argv[2:]:
+        print(path)
+        input = open(path, "rt")
+        #output.write(input.read())
+        output.write(path + "\n")
+    return
+    tree = ET.parse(sys.argv[1])
     root = tree.getroot()
     pybind_strings = libclang_parser.get_docstring_for_all_bindings()
     get_all_class_coverage(root, pybind_strings, prune=True)

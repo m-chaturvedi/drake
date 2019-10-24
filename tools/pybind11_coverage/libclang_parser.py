@@ -1,3 +1,4 @@
+#!/usr/bin/env python3
 # This file parses the python bindings files and extracts the doc variables
 # using libclang.
 
@@ -200,9 +201,7 @@ def get_docstring_for_all_bindings():
     bindings_path = "./bindings/pydrake/**/*.cc"
     ignore_path = ("./bindings/pydrake/common/test",
                    "./bindings/pydrake/attic",
-                   "./bindings/pydrake/maliput",
-                   "./bindings/pydrake/test",
-                   "./bindings/pydrake/systems/test")
+                   "./bindings/pydrake/maliput")
 
     array_for_all_files = []
 
@@ -210,7 +209,6 @@ def get_docstring_for_all_bindings():
         if f.startswith(ignore_path):
             continue
 
-        print(f)
         logging.info("On file: {}".format(f))
         _, final_array = replace_tokens_in_file(f)
         array_for_all_files = array_for_all_files + final_array

@@ -135,4 +135,6 @@ config_setting(
     values = {"define": "NO_SCS=ON"},
 )
 
+exports_files(["pybind11_coverage"])
+
 add_lint_tests()
