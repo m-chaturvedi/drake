@@ -334,6 +334,7 @@ def _generate_pybind_documentation_header_impl(ctx):
     args = ctx.actions.args()
     args.add_all(compile_flags, uniquify = True)
     args.add("-output=" + ctx.outputs.out.path)
+    args.add("-output_xml=" + ctx.outputs.out_xml.path)
     args.add("-quiet")
     args.add("-root-name=" + ctx.attr.root_name)
     for p in ctx.attr.exclude_hdr_patterns:
@@ -343,7 +344,7 @@ def _generate_pybind_documentation_header_impl(ctx):
     args.add_all(package_headers)
 
     ctx.actions.run_shell(
-        outputs = [ctx.outputs.out],
+        outputs = [ctx.outputs.out, ctx.outputs.out_xml],
         inputs = transitive_headers,
         tools = [mkdoc],
         arguments = [args],
@@ -370,6 +371,7 @@ generate_pybind_documentation_header = rule(
             executable = True,
         ),
         "out": attr.output(mandatory = True),
+        "out_xml": attr.output(mandatory = True),
         "root_name": attr.string(default = "pydrake_doc"),
         "exclude_hdr_patterns": attr.string_list(),
     },
