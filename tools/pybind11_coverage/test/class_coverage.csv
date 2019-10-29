@@ -1,0 +1,3 @@
+ClassName,Coverage,Class,Class Template,Type Aliases,Functions,Function Template,Enums,Methods
+drake::solvers::OsqpSolver,1/4,,,,,,,1/4
+drake::solvers::OsqpSolverDetails,8/8,,,,,,,

@@ -1,0 +1,3 @@
+DirCoverage,FileName,Coverage,Class,Class Template,Type Aliases,Functions,Function Template,Enums,Methods
+11/14,drake/tools/pybind11_coverage/test/test.h,11/14,2/2,,,,,,1/4
+,TOTAL,11/14,2/2,,,,,,1/4
