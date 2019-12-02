@@ -157,7 +157,7 @@ void PublishCall(
     google::protobuf::io::CodedOutputStream output(&raw_output);
 
     // Write the size.
-    const int size = message.ByteSize();
+    const int size = message.ByteSizeLong();
     output.WriteVarint32(size);
 
     uint8_t* buffer = output.GetDirectBufferForNBytesAndAdvance(size);
