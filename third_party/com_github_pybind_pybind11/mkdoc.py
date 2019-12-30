@@ -90,6 +90,7 @@ SKIP_ACCESS = [
     AccessSpecifier.PRIVATE,
 ]
 
+docstrings_file = None
 
 def utf8(s):
     # Decodes a string to utf8.
@@ -695,7 +696,20 @@ class SymbolTree(object):
         def get_child(self, piece):
             return self.children_map[piece]
 
+def _unidiff_output(expected, actual):
+    """
+    Helper function. Returns a string containing the unified diff of two multiline strings.
+    """
 
+    import difflib
+    expected=expected.splitlines(1)
+    actual=actual.splitlines(1)
+
+    diff=difflib.unified_diff(expected, actual)
+
+    return ''.join(diff)
+
+DOC_LIST = []
 def extract(include_file_map, cursor, symbol_tree, deprecations=None):
     """
     Extracts libclang cursors and add to a symbol tree.
@@ -739,7 +753,13 @@ def extract(include_file_map, cursor, symbol_tree, deprecations=None):
             node = get_node()
         if len(cursor.spelling) > 0:
             comment = extract_comment(cursor, deprecations)
+            #  docstrings_file.write("BEFORE:\n" + comment + "\n")
+            before = comment
             comment = process_comment(comment)
+            after = comment
+            #  docstrings_file.writelines(["Before:\n", before, "\nAfter:", after])
+            #  docstrings_file.write("\n"+"="*80 + "\n")
+            DOC_LIST.append((before, after))
             symbol = Symbol(cursor, name_chain, include, line, comment)
             node.doc_symbols.append(symbol)
 
@@ -1040,6 +1060,9 @@ def main():
             output_filename = item[len('-output='):]
         elif item.startswith('-std='):
             std = item
+        elif item.startswith('-doc-strings='):
+            global docstrings_file
+            docstrings_file = open(item[len('-doc-strings='):], 'wb')
         elif item.startswith('-root-name='):
             root_name = item[len('-root-name='):]
         elif item.startswith('-exclude-hdr-patterns='):
@@ -1153,3 +1176,5 @@ If you are on Ubuntu, please ensure you have en_US.UTF-8 locales generated:
 
 if __name__ == '__main__':
     main()
+    import pickle
+    pickle.dump(DOC_LIST, docstrings_file)

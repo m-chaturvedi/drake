@@ -71,6 +71,7 @@ generate_pybind_documentation_header(
         "//examples/rimless_wheel:rimless_wheel",
         "//examples/van_der_pol:van_der_pol",
     ],
+    doc_strings = "doc_strings_file.txt",
 )
 
 drake_cc_library(
