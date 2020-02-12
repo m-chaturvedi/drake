@@ -1003,10 +1003,12 @@ class FileDict(object):
         self._d[key] = value
 
 
-def main():
-    parameters = ['-x', 'c++', '-D__MKDOC_PY__']
-    filenames = []
-
+def add_library_paths(parameters=None):
+    """Set library paths for finding libclang on supported platforms.
+    Args:
+        parameters(list): Used for adding parameters.
+    Returns:
+    """
     library_file = None
     if platform.system() == 'Darwin':
         completed_process = subprocess.run(['xcrun', '--find', 'clang'],
@@ -1020,7 +1022,7 @@ def main():
         completed_process = subprocess.run(['xcrun', '--show-sdk-path'],
                                            stdout=subprocess.PIPE,
                                            encoding='utf-8')
-        if completed_process.returncode == 0:
+        if parameters is not None and completed_process.returncode == 0:
             sdkroot = completed_process.stdout.strip()
             if os.path.exists(sdkroot):
                 parameters.append('-isysroot')
@@ -1029,6 +1031,12 @@ def main():
         library_file = '/usr/lib/llvm-6.0/lib/libclang.so'
     if library_file and os.path.exists(library_file):
         cindex.Config.set_library_path(os.path.dirname(library_file))
+
+
+def main():
+    parameters = ['-x', 'c++', '-D__MKDOC_PY__']
+    filenames = []
+    add_library_paths(parameters)
 
     quiet = False
     std = '-std=c++11'
